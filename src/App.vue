@@ -271,13 +271,10 @@
 
       // 查詢借書記錄
       const fetchRecords = async () => {
-        const userId = localStorage.getItem('userId');  // 取出 userId
-        const token = localStorage.getItem('token');    // 取出 Token
+        const auth = authUser(errorMessage2);
+        if (!auth) return;
 
-        if (!token || !userId) {
-          errorMessage2.value = "請先登入";
-          return;
-        }
+        const { userId, token } = auth;
 
         try {
           const response = await axios.get(`http://localhost:8080/users/${userId}/records`, {
@@ -307,13 +304,10 @@
         inventoryIds.value = [];  //清空inventoryIds
       };
       const borrowBooks = async () => {
-        const userId = localStorage.getItem('userId');  // 取出 userId
-        const token = localStorage.getItem('token');    // 取出 Token
+        const auth = authUser(errorMessage3);
+        if (!auth) return;
 
-        if (!userId || !token) {
-          errorMessage3.value = '請先登入';
-          return;
-        }
+        const { userId, token } = auth;
 
         const url = `http://localhost:8080/users/${userId}/borrow`;
         const payload = {
@@ -346,13 +340,10 @@
         recordIds.value = [];
       };
       const returnBooks = async () => {
-        const userId = localStorage.getItem('userId');  // 取出 userId
-        const token = localStorage.getItem('token');    // 取出 Token
+        const auth = authUser(errorMessage4);
+        if (!auth) return;
 
-        if (!userId || !token) {
-          errorMessage4.value = '請先登入';
-          return;
-        }
+        const { userId, token } = auth;
 
         const url = `http://localhost:8080/users/${userId}/return`;
 
@@ -371,6 +362,18 @@
           errorMessage4.value = error.response?.data?.errorMessage4 || "還書失敗";
         }
       };
+
+      const authUser = (errorMessageRef) => {
+        const userId = localStorage.getItem('userId');  // 取出 userId
+        const token = localStorage.getItem('token');    // 取出 Token
+
+        if (!userId || !token) {
+          errorMessageRef.value = '請先登入';
+          return null;
+        }
+
+        return { userId, token };
+      }
 
       return {
         isLogin,
